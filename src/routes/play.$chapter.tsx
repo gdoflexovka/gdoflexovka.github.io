@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { STAGES, CHAPTERS, TRACKS, getChapterById, getLevelById, getTrackById, normalizeAnswer, type Chapter } from "@/lib/levels";
+import { STAGES, TRACKS, getChapterById, getLevelById, getTrackById, normalizeAnswer, type Chapter } from "@/lib/levels";
 
 export const Route = createFileRoute("/play/$chapter")({
   loader: ({ params }: { params: { chapter: string } }) => {
@@ -27,6 +27,44 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+function LevelResultScreen({ track, points, stageLabel, guessed, onContinue }: {
+  track: { title: string; author: string };
+  points: number;
+  stageLabel: string | null;
+  guessed: boolean;
+  onContinue: () => void;
+}) {
+  return (
+    <div className="mt-12 rounded-2xl border border-border bg-card/60 p-8 backdrop-blur animate-fade-up text-center">
+      {guessed ? (
+        <>
+          <p className="text-xs uppercase tracking-[0.2em] text-green-400">Правильно!</p>
+          <h1 className="mt-2 text-3xl font-bold">{track.title}</h1>
+          {track.author !== "—" && <p className="mt-1 text-sm text-muted-foreground">от {track.author}</p>}
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-5 py-2">
+            <span className="text-xs text-muted-foreground">{stageLabel}</span>
+            <span className="text-2xl font-bold text-primary">+{points}</span>
+            <span className="text-xs text-muted-foreground">очк.</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-xs uppercase tracking-[0.2em] text-destructive">Не угадано</p>
+          <h1 className="mt-2 text-3xl font-bold">{track.title}</h1>
+          {track.author !== "—" && <p className="mt-1 text-sm text-muted-foreground">от {track.author}</p>}
+          <p className="mt-4 text-sm text-muted-foreground">+0 очк.</p>
+        </>
+      )}
+      <button
+        onClick={onContinue}
+        className="mt-6 rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-[1.02] hover:shadow-[var(--glow-blue)]"
+      >
+        Продолжить →
+      </button>
+    </div>
+  );
+}
+
 function PlayPage() {
   const { chapter } = Route.useLoaderData() as { chapter: Chapter };
   if (!chapter) throw notFound();
@@ -37,6 +75,8 @@ function PlayPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<"idle" | "wrong">("idle");
+  const [showLevelResult, setShowLevelResult] = useState(false);
+  const [lastGuessed, setLastGuessed] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopTimerRef = useRef<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -56,14 +96,20 @@ function PlayPage() {
   };
 
   useEffect(() => () => stopAudio(), []);
-  useEffect(() => { stopAudio(); setStageIdx(0); setAnswer(""); setFeedback("idle"); }, [levelIdx]);
+  useEffect(() => {
+    stopAudio();
+    setStageIdx(0);
+    setAnswer("");
+    setFeedback("idle");
+    setShowLevelResult(false);
+  }, [levelIdx]);
 
   useEffect(() => {
-    if (!isFinished && currentLevel && !currentTrack) {
+    if (!isFinished && currentLevel && !currentTrack && !showLevelResult) {
       setResults(r => [...r, { levelId: currentLevel.id, points: 0, stageReached: -1 }]);
       setLevelIdx(i => i + 1);
     }
-  }, [currentLevel, currentTrack, isFinished]);
+  }, [currentLevel, currentTrack, isFinished, showLevelResult]);
 
   const playSnippet = async () => {
     if (!currentTrack?.audioSrc) return;
@@ -78,10 +124,15 @@ function PlayPage() {
     } catch { setIsPlaying(false); }
   };
 
-  const finishLevel = (points: number, stageReached: number) => {
+  const finishLevel = (points: number, stageReached: number, guessed: boolean) => {
     stopAudio();
     if (!currentLevel) return;
     setResults(r => [...r, { levelId: currentLevel.id, points, stageReached }]);
+    setLastGuessed(guessed);
+    setShowLevelResult(true);
+  };
+
+  const handleContinue = () => {
     setLevelIdx(i => i + 1);
   };
 
@@ -95,22 +146,22 @@ function PlayPage() {
     if (!currentTrack || !answer.trim()) return;
     const guessed = extractTitle(answer);
     if (normalizeAnswer(guessed) === normalizeAnswer(currentTrack.title)) {
-      finishLevel(currentStage.points, stageIdx);
+      finishLevel(currentStage.points, stageIdx, true);
     } else {
       setFeedback("wrong");
       setAnswer("");
       setTimeout(() => setFeedback("idle"), 600);
-      if (stageIdx + 1 >= STAGES.length) finishLevel(0, -1);
+      if (stageIdx + 1 >= STAGES.length) finishLevel(0, -1, false);
       else setStageIdx(s => s + 1);
     }
   };
 
   const skip = () => {
-    if (stageIdx + 1 >= STAGES.length) finishLevel(0, -1);
+    if (stageIdx + 1 >= STAGES.length) finishLevel(0, -1, false);
     else { stopAudio(); setStageIdx(s => s + 1); }
   };
 
-  const giveUp = () => finishLevel(0, -1);
+  const giveUp = () => finishLevel(0, -1, false);
   const totalPoints = results.reduce((s, r) => s + r.points, 0);
 
   return (
@@ -123,12 +174,21 @@ function PlayPage() {
       </header>
       <main className="relative z-10 mx-auto max-w-3xl px-6 pb-24">
         <p className="text-xs uppercase tracking-[0.2em] text-primary">{chapter.title}</p>
-        {!isFinished && currentLevel && !currentTrack && (
+        {!isFinished && currentLevel && !currentTrack && !showLevelResult && (
           <div className="mt-12 rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center">
             <p className="text-sm text-muted-foreground">Для этого уровня ещё не выбрана музыка.</p>
           </div>
         )}
-        {!isFinished && currentLevel && currentTrack && (
+        {!isFinished && currentLevel && currentTrack && showLevelResult && (
+          <LevelResultScreen
+            track={currentTrack}
+            points={results[results.length - 1]?.points ?? 0}
+            stageLabel={results[results.length - 1]?.stageReached >= 0 ? STAGES[results[results.length - 1].stageReached]?.label ?? null : null}
+            guessed={lastGuessed}
+            onContinue={handleContinue}
+          />
+        )}
+        {!isFinished && currentLevel && currentTrack && !showLevelResult && (
           <>
             <div className="mt-4 flex items-baseline justify-between">
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Уровень {levelIdx + 1} / {order.length}</h1>
