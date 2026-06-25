@@ -73,7 +73,7 @@ function Index() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-              Челлендж для одного конкретного фаната Geometry Dash.
+              Для одного питора с ролью Лёха.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
