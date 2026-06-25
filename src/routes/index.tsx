@@ -4,16 +4,16 @@ import { useEffect, useState } from "react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GDofLexovka — Guess the Geometry Dash level by its music" },
+      { title: "GDofLexovka — Угадай уровень Geometry Dash по музыке" },
       {
         name: "description",
         content:
-          "A challenge for Geometry Dash fans: recognize a level from 0.5, 1, 2, 5 or 15 seconds of its soundtrack. Faster guess — more points.",
+          "Челлендж для фаната Geometry Dash: узнай уровень за 0.5, 1, 2, 5 или 15 секунд саундтрека.",
       },
       { property: "og:title", content: "GDofLexovka" },
       {
         property: "og:description",
-        content: "Guess the Geometry Dash level by a half-second of its music.",
+        content: "Угадай уровень Geometry Dash по полусекунде музыки.",
       },
     ],
   }),
@@ -21,11 +21,11 @@ export const Route = createFileRoute("/")({
 });
 
 const STAGES = [
-  { time: "0.5s", points: 6 },
-  { time: "1.0s", points: 5 },
-  { time: "2.0s", points: 4 },
-  { time: "5.0s", points: 3 },
-  { time: "15s", points: 2 },
+  { time: "0.5с", points: 5, label: "Бурмалда" },
+  { time: "1.0с", points: 4, label: "Нармалда" },
+  { time: "2.0с", points: 3, label: "Вонд павiк" },
+  { time: "5.0с", points: 2, label: "Чизи" },
+  { time: "15с", points: 1, label: "Гербиз" },
 ];
 
 function Index() {
@@ -60,40 +60,20 @@ function Index() {
             GDof<span className="text-primary">Lexovka</span>
           </span>
         </Link>
-        <nav className="hidden items-center gap-8 text-sm text-muted-foreground sm:flex">
-          <a href="#how" className="transition-colors hover:text-foreground">
-            How it works
-          </a>
-          <a href="#scoring" className="transition-colors hover:text-foreground">
-            Scoring
-          </a>
-          <Link
-            to="/"
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-primary hover:text-foreground"
-          >
-            Admin
-          </Link>
-        </nav>
       </header>
 
       {/* Hero */}
       <main className="relative z-10 mx-auto max-w-7xl px-6">
         <section className={`pt-16 sm:pt-24 ${mounted ? "animate-fade-up" : "opacity-0"}`}>
           <div className="mx-auto max-w-3xl text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              A challenge for one specific GD nerd
-            </div>
-
             <h1 className="mt-6 text-5xl font-bold leading-[1.05] tracking-tight sm:text-7xl">
-              Guess the level
+              Угадай уровень
               <br />
-              <span className="text-gradient-blue">in half a second.</span>
+              <span className="text-gradient-blue">за полсекунды.</span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-              You get 0.5s of the soundtrack. Then 1s. Then 2s. Each skip costs points.
-              How fast can you actually name a Geometry Dash level?
+              Челлендж для одного конкретного фаната Geometry Dash.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -101,16 +81,10 @@ function Index() {
                 to="/"
                 className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-[1.02] hover:shadow-[var(--glow-blue)]"
               >
-                <span className="relative z-10">Start the challenge</span>
+                <span className="relative z-10">Начать челлендж</span>
                 <span
                   className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full"
                 />
-              </Link>
-              <Link
-                to="/"
-                className="inline-flex items-center justify-center rounded-lg border border-border bg-card/40 px-7 py-3 text-sm font-semibold text-foreground backdrop-blur transition-colors hover:border-primary hover:bg-card"
-              >
-                Admin login
               </Link>
             </div>
           </div>
@@ -134,17 +108,12 @@ function Index() {
         </section>
 
         {/* Stages */}
-        <section id="scoring" className="relative mt-28">
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-primary">Scoring</p>
-              <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-                Faster guess. More points.
-              </h2>
-            </div>
-            <p className="hidden max-w-xs text-sm text-muted-foreground sm:block">
-              Wrong answer adds time and shows "не засчитано". Skip jumps to the next stage.
-            </p>
+        <section id="scoring" className="relative mt-28 pb-28">
+          <div className="mb-10">
+            <p className="text-xs uppercase tracking-[0.2em] text-primary">Оценки</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+              Быстрее угадал — больше очков.
+            </h2>
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -156,52 +125,13 @@ function Index() {
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Stage {i + 1}
+                  {s.label}
                 </div>
                 <div className="mt-2 text-3xl font-bold text-foreground">{s.time}</div>
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="text-2xl font-bold text-primary">{s.points}</span>
-                  <span className="text-xs text-muted-foreground">pts</span>
+                  <span className="text-xs text-muted-foreground">очк.</span>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section id="how" className="relative mt-28 pb-28">
-          <div className="mb-10">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary">How it works</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-              Three rules. One eardrum.
-            </h2>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                t: "Listen",
-                d: "Press play to hear the snippet. Replay as many times as you want at the current stage.",
-              },
-              {
-                n: "02",
-                t: "Type",
-                d: "Start typing — only the levels added by the admin are suggested. Pick one and submit.",
-              },
-              {
-                n: "03",
-                t: "Skip or fail",
-                d: "Wrong answer or skip unlocks more audio and lowers your score. You always finish a track.",
-              },
-            ].map((step) => (
-              <div
-                key={step.n}
-                className="relative overflow-hidden rounded-xl border border-border bg-card/40 p-6 backdrop-blur transition-colors hover:border-primary/60"
-              >
-                <div className="text-xs font-mono text-primary">{step.n}</div>
-                <h3 className="mt-3 text-lg font-semibold">{step.t}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.d}</p>
               </div>
             ))}
           </div>
@@ -210,8 +140,17 @@ function Index() {
 
       <footer className="relative z-10 border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-muted-foreground sm:flex-row">
-          <span>GDofLexovka — a private challenge.</span>
-          <span className="font-mono">v0.1 · homepage</span>
+          <span>GDofLexovka — приватный челлендж.</span>
+          <div className="flex items-center gap-4">
+            <span className="font-mono">v0.1</span>
+            <Link
+              to="/admin"
+              className="text-muted-foreground/30 transition-colors hover:text-primary"
+              aria-label="."
+            >
+              ·
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
