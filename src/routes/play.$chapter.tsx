@@ -11,7 +11,6 @@ import {
 } from "@/lib/levels";
 
 export const Route = createFileRoute("/play/$chapter")({
-  loader: ({ params }) => {
   loader: ({ params }: { params: { chapter: string } }) => {
     const chapter = getChapterById(params.chapter);
     if (!chapter) throw notFound();
