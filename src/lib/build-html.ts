@@ -4,6 +4,26 @@ import type { Plugin, ResolvedConfig } from "vite";
 import fs from "node:fs";
 import path from "node:path";
 
+function readManifest(serverAssetsDir: string): Record<string, unknown> | null {
+  if (!fs.existsSync(serverAssetsDir)) return null;
+  const manifestFile = fs
+    .readdirSync(serverAssetsDir)
+    .find((f) => f.startsWith("_tanstack-start-manifest_"));
+  if (!manifestFile) return null;
+  try {
+    const content = fs.readFileSync(
+      path.join(serverAssetsDir, manifestFile),
+      "utf-8",
+    );
+    const match = content.match(/=>\s*(\([\s\S]*?\))\s*;/);
+    if (!match) return null;
+    const fn = new Function(`return ${match[1]}`) as () => Record<string, unknown>;
+    return fn();
+  } catch {
+    return null;
+  }
+}
+
 export function generateIndexHtml(): Plugin {
   let base = "/";
 
@@ -48,6 +68,13 @@ export function generateIndexHtml(): Plugin {
 
       const assetBase = base.endsWith("/") ? base : base + "/";
 
+      const manifest = readManifest(path.resolve("dist/server/assets"));
+      const routesManifest = (manifest?.routes ?? {}) as Record<string, unknown>;
+
+      const tsrInit = manifest
+        ? `<script class="$tsr" id="$tsr-stream-barrier">(self.$R=self.$R||{}).tsr=[];self.$_TSR={h(){this.hydrated=!0,this.c()},e(){this.streamEnded=!0,this.c()},c(){this.hydrated&&this.streamEnded&&(delete self.$_TSR,delete self.$R.tsr)},p(e){this.initialized?e():this.buffer.push(e)},buffer:[],initialized:!0};$_TSR.router={manifest:{routes:${JSON.stringify(routesManifest)}},matches:[{i:"__root__",u:Date.now(),s:"success",ssr:!1},{i:"",u:Date.now(),s:"success",ssr:!1}],lastMatchId:""};$_TSR.e();document.currentScript.remove()</script>`
+        : "";
+
       const html = `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -64,6 +91,7 @@ ${mainCss ? `  <link rel="stylesheet" href="${assetBase}assets/${mainCss}" />` :
 </head>
 <body>
   <div id="root"></div>
+${tsrInit}
   <script type="module" src="${assetBase}assets/${mainJs}"></script>
 </body>
 </html>`;
