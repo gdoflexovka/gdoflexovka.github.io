@@ -29,7 +29,7 @@ function LevelCard({ lv, idx, tracks, onSetTrack, onDelete, loading }: {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">Уровень {idx + 1}</p>
         {trk ? (
-          <p className="text-xs text-muted-foreground truncate">{trk.title} — {trk.author}</p>
+          <p className="text-xs text-muted-foreground truncate">{trk.title} — {trk.author}{trk.newgroundsUrl ? " · NG" : ""}</p>
         ) : (
           <p className="text-xs text-destructive/60 truncate">Без музыки</p>
         )}
@@ -43,7 +43,7 @@ function LevelCard({ lv, idx, tracks, onSetTrack, onDelete, loading }: {
             autoFocus
           >
             <option value="">— Без музыки —</option>
-            {tracks.map(t => <option key={t.id} value={t.id}>{t.title} — {t.author}</option>)}
+            {tracks.map(t => <option key={t.id} value={t.id}>{t.title} — {t.author}{t.newgroundsUrl ? " [NG]" : ""}</option>)}
           </select>
         ) : (
           <button

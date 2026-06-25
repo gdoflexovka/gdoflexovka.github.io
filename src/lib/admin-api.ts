@@ -25,13 +25,15 @@ function writeLevelsFile(content: string): void {
   fs.writeFileSync(path.resolve("src/lib/levels.ts"), content, "utf-8");
 }
 
-function addTrackToFile(title: string, author: string, audioPath: string): { id: string } | null {
+function addTrackToFile(title: string, author: string, audioPath: string, newgroundsUrl: string): { id: string } | null {
   let content = readLevelsFile();
   if (!content) return null;
 
   const id = "t" + Date.now().toString(36);
-  const audioPart = audioPath ? `, audioSrc: "${audioPath}"` : "";
-  const newEntry = `  { id: "${id}", title: "${title.replace(/"/g, '\\"')}", author: "${author.replace(/"/g, '\\"')}"${audioPart} },`;
+  const parts: string[] = [`id: "${id}"`, `title: "${title.replace(/"/g, '\\"')}"`, `author: "${author.replace(/"/g, '\\"')}"`];
+  if (audioPath) parts.push(`audioSrc: "${audioPath}"`);
+  if (newgroundsUrl) parts.push(`newgroundsUrl: "${newgroundsUrl.replace(/"/g, '\\"')}"`);
+  const newEntry = `  { ${parts.join(", ")} },`;
 
   const idx = content.indexOf("export const TRACKS: Track[] = [");
   if (idx < 0) return null;
@@ -174,7 +176,7 @@ export function adminApiPlugin(): Plugin {
               audioPath = "/tracks/" + fn;
             }
 
-            const r = addTrackToFile(title, author, audioPath);
+            const r = addTrackToFile(title, author, audioPath, body.newgroundsUrl || "");
             if (!r) { res.statusCode = 500; res.end(JSON.stringify({ error: "File write failed" })); return; }
             res.end(JSON.stringify({ ok: true, id: r.id, title, author, audioPath }));
           }

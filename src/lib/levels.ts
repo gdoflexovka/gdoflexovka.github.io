@@ -3,6 +3,7 @@ export type Track = {
   title: string;
   author: string;
   audioSrc?: string;
+  newgroundsUrl?: string;
 };
 
 export type Level = {
@@ -17,11 +18,18 @@ export type Chapter = {
 };
 
 export const TRACKS: Track[] = [  { id: "tmqtheudp", title: "Bloodbath", author: "Riot", audioSrc: "/tracks/bloodbath.mp3" },
+  { id: "tmqtj5ff1", title: "Clubstep", author: "RobTop", audioSrc: "/tracks/clubstep.mp3" },
 ];
 
-export const LEVELS: Level[] = [];
+export const LEVELS: Level[] = [  { id: "lmqthp28i", trackId: "tmqtheudp" },
+];
 
-export const CHAPTERS: Chapter[] = [];
+export const CHAPTERS: Chapter[] = [  {
+    id: "chmqthovza",
+    title: "Сиксевенские войска",
+    levelIds: [ "lmqthp28i",],
+  },
+];
 
 export const STAGES: { duration: number; points: number; label: string }[] = [
   { duration: 0.5, points: 6, label: "Бурмалда" },

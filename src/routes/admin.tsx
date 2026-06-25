@@ -60,6 +60,7 @@ function TrackManager() {
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [ngUrl, setNgUrl] = useState("");
   const [mp3B64, setMp3B64] = useState("");
   const [mp3Fn, setMp3Fn] = useState("");
   const [fnDisplay, setFnDisplay] = useState("");
@@ -68,7 +69,7 @@ function TrackManager() {
   const [loading, setLoading] = useState(false);
 
   const refresh = () => setTracks([...TRACKS]);
-  const reset = () => { setTitle(""); setAuthor(""); setMp3B64(""); setMp3Fn(""); setFnDisplay(""); setShowForm(false); if (fileRef.current) fileRef.current.value = ""; };
+  const reset = () => { setTitle(""); setAuthor(""); setNgUrl(""); setMp3B64(""); setMp3Fn(""); setFnDisplay(""); setShowForm(false); if (fileRef.current) fileRef.current.value = ""; };
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -88,7 +89,7 @@ function TrackManager() {
     if (!title.trim()) return;
     setLoading(true); setMsg("");
     try {
-      const res = await fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ op: "add-track", title: title.trim(), author: author.trim(), mp3Base64: mp3B64 || undefined, mp3Filename: mp3Fn || undefined }) });
+      const res = await fetch("/api/admin", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ op: "add-track", title: title.trim(), author: author.trim(), mp3Base64: mp3B64 || undefined, mp3Filename: mp3Fn || undefined, newgroundsUrl: ngUrl.trim() || undefined }) });
       const d = await res.json();
       if (res.ok && d.ok) { setMsg(`Трек "${d.title}" добавлен`); refresh(); reset(); }
       else setMsg("Ошибка: " + (d.error || "?"));
@@ -153,6 +154,10 @@ function TrackManager() {
                 <input ref={fileRef} type="file" accept="audio/mpeg,.mp3" onChange={onFile} className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-border file:bg-card file:text-sm file:text-foreground file:cursor-pointer hover:file:border-primary" />
                 {fnDisplay && <p className="mt-2 text-xs text-muted-foreground">Выбран: <span className="text-primary">{fnDisplay}</span></p>}
               </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-1">Ссылка на Newgrounds</label>
+                <input type="url" value={ngUrl} onChange={e => setNgUrl(e.target.value)} placeholder="https://www.newgrounds.com/audio/listen/..." className="w-full rounded-lg border border-border bg-card/60 px-4 py-3 text-sm outline-none focus:border-primary" />
+              </div>
             </div>
             <div className="mt-6 flex gap-3">
               <button type="submit" disabled={loading || !title.trim()} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:scale-[1.02] disabled:opacity-60 transition-all">{loading ? "..." : "Добавить"}</button>
@@ -167,7 +172,7 @@ function TrackManager() {
             <div key={t.id} className="flex items-center gap-4 rounded-lg border border-border bg-card/40 px-5 py-4 hover:border-primary transition-all">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{t.title}</p>
-                <p className="text-xs text-muted-foreground">{t.author}{t.audioSrc ? ` · ${t.audioSrc}` : " · без mp3"}</p>
+                <p className="text-xs text-muted-foreground">{t.author}{t.audioSrc ? ` · ${t.audioSrc}` : " · без mp3"}{t.newgroundsUrl ? " · NG" : ""}</p>
               </div>
               <button onClick={() => del(t.id, t.title)} disabled={loading} className="rounded-md border border-border bg-card/60 px-3 py-1.5 text-xs text-muted-foreground hover:border-destructive hover:text-destructive disabled:opacity-40">Удалить</button>
             </div>

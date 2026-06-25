@@ -144,7 +144,7 @@ function PlayPage() {
               ))}
             </div>
             <div className="mt-8 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur">
-              {currentTrack.audioSrc ? (
+                {currentTrack.audioSrc ? (
                 <>
                   <audio ref={audioRef} src={currentTrack.audioSrc} preload="auto" onEnded={stopAudio} />
                   <div className="flex items-center justify-between gap-4">
@@ -154,6 +154,10 @@ function PlayPage() {
                     <div className="text-xs text-muted-foreground">Можно жать сколько угодно раз</div>
                   </div>
                 </>
+              ) : currentTrack.newgroundsUrl ? (
+                <div className="text-center text-sm text-muted-foreground">
+                  <a href={currentTrack.newgroundsUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Открыть на Newgrounds →</a>
+                </div>
               ) : (
                 <div className="text-center text-sm text-muted-foreground">Трек ещё не загружен.</div>
               )}
