@@ -78,7 +78,7 @@ function Index() {
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link
-                to="/"
+                to="/chapters"
                 className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-[1.02] hover:shadow-[var(--glow-blue)]"
               >
                 <span className="relative z-10">Начать челлендж</span>
