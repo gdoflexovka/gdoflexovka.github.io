@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 });
 
 const STAGES = [
-  { time: "0.5с", points: 5, label: "Бурмалда" },
+  { time: "0.5с", points: 6, label: "Бурмалда" },
   { time: "1.0с", points: 4, label: "Нармалда" },
   { time: "2.0с", points: 3, label: "Вонд павiк" },
   { time: "5.0с", points: 2, label: "Чизи" },

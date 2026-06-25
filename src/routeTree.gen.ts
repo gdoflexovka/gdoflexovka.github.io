@@ -13,6 +13,7 @@ import { Route as ChaptersRouteImport } from './routes/chapters'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayChapterRouteImport } from './routes/play.$chapter'
+import { Route as AdminChaptersRouteImport } from './routes/admin.chapters'
 
 const ChaptersRoute = ChaptersRouteImport.update({
   id: '/chapters',
@@ -34,37 +35,51 @@ const PlayChapterRoute = PlayChapterRouteImport.update({
   path: '/play/$chapter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminChaptersRoute = AdminChaptersRouteImport.update({
+  id: '/chapters',
+  path: '/chapters',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/chapters': typeof ChaptersRoute
+  '/admin/chapters': typeof AdminChaptersRoute
   '/play/$chapter': typeof PlayChapterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/chapters': typeof ChaptersRoute
+  '/admin/chapters': typeof AdminChaptersRoute
   '/play/$chapter': typeof PlayChapterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/chapters': typeof ChaptersRoute
+  '/admin/chapters': typeof AdminChaptersRoute
   '/play/$chapter': typeof PlayChapterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/chapters' | '/play/$chapter'
+  fullPaths: '/' | '/admin' | '/chapters' | '/admin/chapters' | '/play/$chapter'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/chapters' | '/play/$chapter'
-  id: '__root__' | '/' | '/admin' | '/chapters' | '/play/$chapter'
+  to: '/' | '/admin' | '/chapters' | '/admin/chapters' | '/play/$chapter'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/chapters'
+    | '/admin/chapters'
+    | '/play/$chapter'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ChaptersRoute: typeof ChaptersRoute
   PlayChapterRoute: typeof PlayChapterRoute
 }
@@ -99,15 +114,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayChapterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/chapters': {
+      id: '/admin/chapters'
+      path: '/chapters'
+      fullPath: '/admin/chapters'
+      preLoaderRoute: typeof AdminChaptersRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminChaptersRoute: typeof AdminChaptersRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminChaptersRoute: AdminChaptersRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   ChaptersRoute: ChaptersRoute,
   PlayChapterRoute: PlayChapterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

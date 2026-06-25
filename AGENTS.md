@@ -1,10 +1,23 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# GDofLexovka
+
+Челлендж «Угадай уровень Geometry Dash по музыке».
+
+## Запуск локально
+
+```
+dev.bat
+```
+
+## Админка
+
+Локально через `dev.bat`: `/admin` (логин: admin, пароль: 1243)
+
+1. Добавляешь треки (название + автор + mp3)
+2. Создаёшь главы и уровни, назначаешь треки на уровни
+3. Изменения сохраняются в `src/lib/levels.ts` и `public/tracks/`
+4. Коммитишь, пушишь, деплоишь
+
+## Деплой
+
+GitHub Actions настроен на автодеплой при пуше в main.
+Базовый путь в `vite.config.ts` (переменная BASE).

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GDofLexovka</title>
+  <script>
+    // GitHub Pages SPA redirect trick.
+    // Вычисляем базовый путь из URL этого файла и редиректим на корень,
+    // сохранив исходный путь для восстановления в SPA.
+    var fullPath = window.location.pathname;
+    // 404.html всегда лежит в корне билда, находим базовый путь
+    var base = fullPath.substring(0, fullPath.lastIndexOf('/') + 1);
+    // Сохраняем полный исходный путь (включая search и hash)
+    sessionStorage.setItem('gd_redirect_path', fullPath + window.location.search + window.location.hash);
+    window.location.replace(base);
+  </script>
+</head>
+<body></body>
+</html>
