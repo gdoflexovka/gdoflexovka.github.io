@@ -45,7 +45,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 function PlayPage() {
-  const { chapter } = Route.useLoaderData();
+  const { chapter } = Route.useLoaderData() as { chapter: Chapter };
 
   // Перемешанный порядок уровней в этой сессии.
   const order = useMemo(() => shuffle(chapter.levelIds), [chapter]);
