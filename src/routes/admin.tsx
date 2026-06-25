@@ -1,16 +1,28 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { adminLogin, adminLogout, isAdminAuthenticated, TRACKS, type Track } from "@/lib/levels";
 
 export const Route = createFileRoute("/admin")({
-  component: AdminPage,
+  component: AdminLayout,
 });
 
-function AdminPage() {
+function AdminLayout() {
   const [authed, setAuthed] = useState(false);
   useEffect(() => setAuthed(isAdminAuthenticated()), []);
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />;
-  return <TrackManager onLogout={() => { adminLogout(); setAuthed(false); }} />;
+  return <AdminShell />;
+}
+
+function AdminShell() {
+  const location = useLocation();
+  const isExactAdmin = location.pathname === "/admin";
+
+  return (
+    <>
+      {isExactAdmin && <TrackManager />}
+      <Outlet />
+    </>
+  );
 }
 
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
@@ -43,7 +55,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function TrackManager({ onLogout }: { onLogout: () => void }) {
+function TrackManager() {
   const [tracks, setTracks] = useState<Track[]>([...TRACKS]);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
@@ -107,7 +119,7 @@ function TrackManager({ onLogout }: { onLogout: () => void }) {
         <div className="flex items-center gap-4">
           <Link to="/admin/chapters" className="text-sm text-primary hover:underline">Главы и уровни →</Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← На главную</Link>
-          <button onClick={onLogout} className="text-sm text-muted-foreground hover:text-destructive">Выйти</button>
+          <button onClick={() => { adminLogout(); setTracks([...TRACKS]); window.location.reload(); }} className="text-sm text-muted-foreground hover:text-destructive">Выйти</button>
         </div>
       </header>
       <main className="relative z-10 mx-auto max-w-3xl px-6 pb-24">

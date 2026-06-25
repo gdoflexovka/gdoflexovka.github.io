@@ -16,7 +16,8 @@ export type Chapter = {
   levelIds: string[];
 };
 
-export const TRACKS: Track[] = [];
+export const TRACKS: Track[] = [  { id: "tmqtheudp", title: "Bloodbath", author: "Riot", audioSrc: "/tracks/bloodbath.mp3" },
+];
 
 export const LEVELS: Level[] = [];
 
