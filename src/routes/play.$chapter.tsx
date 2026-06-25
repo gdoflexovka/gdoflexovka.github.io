@@ -8,6 +8,7 @@ import {
   getLevelById,
   normalizeAnswer,
   type Level,
+  type Chapter,
 } from "@/lib/levels";
 
 export const Route = createFileRoute("/play/$chapter")({
