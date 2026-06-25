@@ -7,7 +7,7 @@ export type Track = {
 
 export type Level = {
   id: string;
-  trackId: string;
+  trackId: string | null;
 };
 
 export type Chapter = {
@@ -22,8 +22,7 @@ export const TRACKS: Track[] = [
   { id: "t3", title: "Трек 3", author: "—" },
   { id: "t4", title: "Трек 4", author: "—" },
   { id: "t5", title: "Трек 5", author: "—" },
-  { id: "t6", title: "Трек 6", author: "—" },
-];
+  { id: "t6", title: "Трек 6", author: "—" },];
 
 export const LEVELS: Level[] = [
   { id: "l1", trackId: "t1" },

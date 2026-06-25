@@ -85,12 +85,13 @@ function removeChapterFromFile(id: string): boolean {
   return true;
 }
 
-function addLevelToFile(chapterId: string, trackId: string): { id: string } | null {
+function addLevelToFile(chapterId: string, trackId: string | null): { id: string } | null {
   let content = readLevelsFile();
   if (!content) return null;
 
   const id = "l" + Date.now().toString(36);
-  const newEntry = `  { id: "${id}", trackId: "${trackId}" },`;
+  const trackIdStr = trackId ? `"${trackId}"` : "null";
+  const newEntry = `  { id: "${id}", trackId: ${trackIdStr} },`;
 
   const idx = content.indexOf("export const LEVELS: Level[] = [");
   if (idx < 0) return null;
@@ -125,12 +126,13 @@ function removeLevelFromFile(id: string): boolean {
   return true;
 }
 
-function editLevelTrack(id: string, trackId: string): boolean {
+function editLevelTrack(id: string, trackId: string | null): boolean {
   let content = readLevelsFile();
   if (!content) return false;
+  const newVal = trackId ? `"${trackId}"` : "null";
   content = content.replace(
-    new RegExp(`(id:\\s*"${id}",\\s*trackId:\\s*")[^"]*(")`),
-    `$1${trackId}$2`
+    new RegExp(`(id:\\s*"${id}",\\s*trackId:\\s*)("[^"]*"|null)`),
+    `$1${newVal}`
   );
   writeLevelsFile(content);
   return true;
@@ -194,8 +196,8 @@ export function adminApiPlugin(): Plugin {
             res.end(JSON.stringify({ ok: true }));
           }
           else if (op === "add-level") {
-            if (!body.chapterId || !body.trackId) { res.statusCode = 400; res.end(JSON.stringify({ error: "Need chapterId and trackId" })); return; }
-            const r = addLevelToFile(body.chapterId, body.trackId);
+            if (!body.chapterId) { res.statusCode = 400; res.end(JSON.stringify({ error: "Need chapterId" })); return; }
+            const r = addLevelToFile(body.chapterId, body.trackId ?? null);
             if (!r) { res.statusCode = 500; res.end(JSON.stringify({ error: "File write failed" })); return; }
             res.end(JSON.stringify({ ok: true, id: r.id }));
           }
@@ -205,8 +207,8 @@ export function adminApiPlugin(): Plugin {
             res.end(JSON.stringify({ ok: true }));
           }
           else if (op === "edit-level-track") {
-            if (!body.id || !body.trackId) { res.statusCode = 400; res.end(JSON.stringify({ error: "Need id and trackId" })); return; }
-            editLevelTrack(body.id, body.trackId);
+            if (!body.id) { res.statusCode = 400; res.end(JSON.stringify({ error: "Need id" })); return; }
+            editLevelTrack(body.id, body.trackId ?? null);
             res.end(JSON.stringify({ ok: true }));
           }
           else {

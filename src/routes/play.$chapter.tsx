@@ -58,6 +58,13 @@ function PlayPage() {
   useEffect(() => () => stopAudio(), []);
   useEffect(() => { stopAudio(); setStageIdx(0); setAnswer(""); setFeedback("idle"); }, [levelIdx]);
 
+  useEffect(() => {
+    if (!isFinished && currentLevel && !currentTrack) {
+      setResults(r => [...r, { levelId: currentLevel.id, points: 0, stageReached: -1 }]);
+      setLevelIdx(i => i + 1);
+    }
+  }, [currentLevel, currentTrack, isFinished]);
+
   const playSnippet = async () => {
     if (!currentTrack?.audioSrc) return;
     const a = audioRef.current;
@@ -116,6 +123,11 @@ function PlayPage() {
       </header>
       <main className="relative z-10 mx-auto max-w-3xl px-6 pb-24">
         <p className="text-xs uppercase tracking-[0.2em] text-primary">{chapter.title}</p>
+        {!isFinished && currentLevel && !currentTrack && (
+          <div className="mt-12 rounded-2xl border border-dashed border-border bg-card/40 p-8 text-center">
+            <p className="text-sm text-muted-foreground">Для этого уровня ещё не выбрана музыка.</p>
+          </div>
+        )}
         {!isFinished && currentLevel && currentTrack && (
           <>
             <div className="mt-4 flex items-baseline justify-between">
