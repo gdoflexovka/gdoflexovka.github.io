@@ -16,30 +16,11 @@ export type Chapter = {
   levelIds: string[];
 };
 
-export const TRACKS: Track[] = [
-  { id: "t1", title: "Трек 1", author: "—" },
-  { id: "t2", title: "Трек 2", author: "—" },
-  { id: "t3", title: "Трек 3", author: "—" },
-  { id: "t4", title: "Трек 4", author: "—" },
-  { id: "t5", title: "Трек 5", author: "—" },
-  { id: "t6", title: "Трек 6", author: "—" },];
+export const TRACKS: Track[] = [];
 
-export const LEVELS: Level[] = [
-  { id: "l1", trackId: "t1" },
-  { id: "l2", trackId: "t2" },
-  { id: "l3", trackId: "t3" },
-  { id: "l4", trackId: "t4" },
-  { id: "l5", trackId: "t5" },
-  { id: "l6", trackId: "t6" },
-];
+export const LEVELS: Level[] = [];
 
-export const CHAPTERS: Chapter[] = [
-  {
-    id: "main",
-    title: "Основной челлендж",
-    levelIds: ["l1", "l2", "l3", "l4", "l5", "l6"],
-  },
-];
+export const CHAPTERS: Chapter[] = [];
 
 export const STAGES: { duration: number; points: number; label: string }[] = [
   { duration: 0.5, points: 6, label: "Бурмалда" },
