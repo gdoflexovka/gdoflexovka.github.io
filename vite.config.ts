@@ -12,7 +12,7 @@ import { adminApiPlugin } from "./src/lib/admin-api";
 // Если репо называется gd-music-challenge, то BASE = '/gd-music-challenge/'
 // Если это user page (username.github.io), то BASE = '/'
 // Если свой домен, то BASE = '/'
-const BASE = process.env.BASE_PATH ?? "/";
+const BASE = "/";
 
 export default defineConfig({
   vite: {
